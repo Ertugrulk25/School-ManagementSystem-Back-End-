@@ -1,0 +1,26 @@
+Bu süreçte toplamda 11 farklı class aktif olarak kullanılıyor:
+
+Class Adı                	Katman	                       Açıklama
+
+UserController		       Controller            HTTP isteğini karşılıyor.
+
+UserService	                Service             Kullanıcı kaydını yönetiyor.
+
+UniquePropertyValidator	   Validation  	        Kullanıcı bilgilerinin eşsiz
+                                                 olup olmadığını kontrol ediyor.
+
+UserMapper		             Mapper              DTO → Entity dönüşümü yapıyor.
+
+UserRepository		        Repository           Kullanıcıyı veri tabanına kaydediyor.
+
+UserRoleRepository		    Repository          Kullanıcının rolünü veri tabanından getiriyor.
+
+User		                 Entity              Kullanıcı nesnesi.
+
+UserRole		             Entity              Kullanıcının rol bilgisini tutuyor.
+
+UserRequest	                   DTO	             Kullanıcıdan gelen veriyi taşıyor.
+
+UserResponse		           DTO               API yanıtında dönen kullanıcı bilgisi.
+
+ResponseMessage<UserResponse>	DTO	             API yanıtını kapsayan genel mesaj.

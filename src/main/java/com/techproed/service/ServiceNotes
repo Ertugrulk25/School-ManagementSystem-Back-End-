@@ -1,0 +1,77 @@
+UniquePropertyValidator, kullanıcı adı (username), e-posta, telefon numarası
+ve SSN gibi benzersiz özelliklerin zaten veritabanında var olup olmadığını kontrol
+eder. Bu, veritabanı sorguları gerektiren bir doğrulama işlemi olduğundan,
+Spring'in @Valid anotasyonu bu tür işlemleri otomatik olarak yapmaz.
+
+    Özetle, @Valid ile veri doğrulaması yapılırken, veritabanında zaten var
+olan verileri kontrol etmek için UniquePropertyValidator gibi bir sınıf
+gerekir. Bu, custom validation olarak sınıflandırılabilir çünkü veritabanı
+sorguları içerir ve işlem mantığınızı içerir.
+
+***************************************************************
+
+    checkDuplication metodunu değerlendirecek olursak, bu metodun temel amacı
+    veritabanında belirli alanların benzersiz olup olmadığını kontrol etmek ve
+    eğer zaten varsa ConflictException fırlatmaktır.
+
+Metot, userRepository aracılığıyla veritabanına sorgular yaparak, belirtilen
+kullanıcı adı (username), SSN (ssn), telefon numarası (phone) ve e-posta (email)
+değerlerinin zaten var olup olmadığını kontrol eder. Eğer bu değerlerden biri zaten
+ varsa, ilgili hata mesajını içeren bir ConflictException fırlatır.
+
+Kodun Çalışma Mantığı
+userRepository.existsByUsername(username)
+
+Eğer username veritabanında zaten kayıtlıysa, bir hata fırlatır.
+userRepository.existsByEmail(email)
+
+Eğer email zaten veritabanında varsa, hata fırlatır.
+userRepository.existsByPhoneNumber(phone)
+
+Eğer phone zaten kullanılıyorsa, hata fırlatır.
+userRepository.existsBySsn(ssn)
+
+Eğer ssn zaten varsa, hata fırlatır.
+
+******************************************************
+
+1️⃣ Pageable Nedir?
+Pageable, verileri sayfa sayfa getirmek için kullanılan bir Spring Data JPA
+ arayüzüdür.
+
+Spring'de büyük veri kümelerini almak yerine, veriyi parça parça (sayfa halinde)
+ alarak performansı artırmak için kullanılır.
+
+ public class PageableHelper {
+     public Pageable getPageable(int page, int size, String sort, String type) {
+         return PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(type), sort));
+     }
+
+📌 Parametreler:
+
+int page → Kaçıncı sayfanın getirileceğini belirler (0 tabanlı).
+int size → Sayfa başına kaç veri getirileceğini belirler.
+String sort → Hangi sütuna göre sıralama yapılacağını belirler.
+String type → Sıralama türünü belirler:
+"ASC" (artan - küçükten büyüğe)
+"DESC" (azalan - büyükten küçüğe)
+📌 Çalışma Mantığı:
+
+PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(type), sort));
+page: Kaçıncı sayfa getirilecek
+size: Kaç kayıt getirilecek
+sort: Hangi alana göre sıralanacak
+type: "ASC" veya "DESC" sıralama yönü
+
+
+
+
+
+
+
+
+
+
+
+
+

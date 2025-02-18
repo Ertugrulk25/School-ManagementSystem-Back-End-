@@ -1,0 +1,337 @@
+// @Builder , Sınıfına Builder Pattern Özelliği kazandırarak nesne oluşturmayı daha okunabilir
+/ ve esnek hale getirir.
+// Karmaşık yapıcı methodar (constructor) veya Setter kullanmadan nesne oluşturmamıza yardımcı olur.
+// Immutable (değişmez) nesneler oluşturmayı kolaylaştırır.
+/*import lombok.Builder;
+import lombok.ToString;
+
+@Builder
+@ToString
+public class User {
+    private String name;
+    private String email;
+    private int age;
+}
+public class Main {
+    public static void main(String[] args) {
+        User user = User.builder()
+                .name("Ahmet")
+                .email("ahmet@example.com")
+                .age(25)
+                .build();
+
+        System.out.println(user);
+    }
+}
+*******************************************************
+    @Enumerated(EnumType.STRING)
+    // Enum ın veritabanı tablosunda süttuna olarak saklanırken isim ile mi yoksa
+    //sıra numarası ile mi saklanacağını belirler (STRING veye ORDINAL)
+    private RoleType roleType;
+
+    ********************************************
+   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        private String password;
+    /*Bu anotasyon sayesinde password alanı JSON çıktısında görünmez, ancak
+        JSON'dan Java nesnesine çevrilirken alınabilir.
+    Güvenlik açısından şifre gibi hassas verilerin JSON yanıtında gönderilmesini
+    önlemek için kullanılır.
+    Yalnızca giriş (deserialization) için izin verir, ancak JSON çıktısında
+     (serialization) yer almaz.*/
+
+*****************************************************************
+🎯🎯🎯 @PreRemove 🎯🎯🎯
+private void removeLessonFromUser() {
+    users.forEach(user -> user.getLessonProgramList().remove(this));
+}
+🔹 Bu metod, LessonProgram nesnesi silinmeden hemen önce çalıştırılır.
+🔹 Bu işlem, ilişkili kullanıcıların (users) lessonProgramList listesinden bu ders programını (this) kaldırır.
+🔹 Eğer bu işlem yapılmazsa, kullanıcıların lessonProgramList'inde silinmiş bir ders programı kalabilir ve hata alınabilir.
+
+🎯 Kodun Çalışma Mantığı
+Diyelim ki aşağıdaki gibi bir ilişki var:
+
+
+@Entity
+public class User {
+    @ManyToMany(mappedBy = "users")
+    private List<LessonProgram> lessonProgramList;
+}
+
+@Entity
+public class LessonProgram {
+    @ManyToMany
+    private List<User> users;
+
+    @PreRemove
+    private void removeLessonFromUser() {
+        users.forEach(user -> user.getLessonProgramList().remove(this));
+    }
+}
+📌 Örnek Senaryo:
+1️⃣ Kullanıcı ve Ders Programı Arasındaki İlişki
+📌 Önceden Kullanıcı - Ders Programı İlişkisi:
+
+
+{
+  "user": "Ali",
+  "lessonPrograms": ["Math", "Physics"]
+}
+2️⃣ Ders Programı Silme İşlemi (DELETE FROM LessonProgram WHERE id = X)
+✅ @PreRemove devreye girer ve users listesinden bu dersi çıkarır.
+✅ Kullanıcı listesindeki lessonProgramList güncellenmiş olur.
+
+📌 Son Durum:
+
+{
+  "user": "Ali",
+  "lessonPrograms": ["Physics"]
+}
+🎯 @PreRemove Kullanılmasaydı Ne Olurdu?
+🔴 Silme işleminden sonra user.getLessonProgramList() hâlâ silinen LessonProgram'ı içerirdi.
+🔴 İlişkili tablolar arasında yetim (orphan) veri kalabilir, bu da hata veya tutarsızlığa yol açabilir.
+
+📌 Özet
+@PreRemove, LessonProgram silinmeden önce kullanıcı listesindeki (users) bu dersi temizler.
+Bu sayede ilişkili nesneler arasında yetim veri (orphan data) kalmaz.
+Özellikle @ManyToMany ilişkilerinde veri tutarsızlığını önlemek için kullanışlıdır.
+Kod, veri bütünlüğünü korumak için silme işlemi öncesinde tetiklenir. 🚀
+
+*******************************************************************
+
+Kullanım Senaryosu	Tercih Edilmesi Gereken
+Hassas veriyi tamamen gizlemek (JSON'da hiç olmamalı)	@JsonIgnore
+Sadece JSON girişlerinde kullanılacak (POST, PUT ile alınacak ama JSON içinde gösterilmeyecek)	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
+@JsonIgnore → JSON'a yazılmaz, JSON'dan okunmaz.
+@JsonProperty(access = JsonProperty.Access.WRITE_ONLY) → JSON'dan okunur ama JSON'a yazılmaz. (Örn: Şifre girişlerinde)
+🔹 Eğer şifreyi API’den almak ama istemcide göstermemek istiyorsan @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) kullanmalısın.
+🔹 Şifreyi API’ye hiç dahil etmek istemiyorsan @JsonIgnore kullanmalısın.
+
+*********************************************************
+CASCADE TÜRLERİ
+1️⃣ ALL
+✅ Tüm cascade işlemlerini uygular (PERSIST, MERGE, REMOVE, REFRESH, DETACH).
+
+
+@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+private List<Lesson> lessons;
+📌 Örnek:
+
+Student kaydedildiğinde (persist) ilişkili Lesson nesneleri de kaydedilir.
+Student silindiğinde (remove) ilişkili Lesson nesneleri de silinir.
+2️⃣ PERSIST
+✅ Sadece persist (kaydetme) işlemini ilişkili entity'lere uygular.
+
+
+@OneToMany(mappedBy = "student", cascade = CascadeType.PERSIST)
+private List<Lesson> lessons;
+📌 Örnek:
+
+Student nesnesi kaydedildiğinde (persist) ilişkili Lesson nesneleri de kaydedilir.
+Ancak, Student silindiğinde Lesson nesneleri silinmez.
+3️⃣ MERGE
+✅ Entity güncellendiğinde, ilişkili entity'ler de güncellenir.
+
+
+@OneToMany(mappedBy = "student", cascade = CascadeType.MERGE)
+private List<Lesson> lessons;
+📌 Örnek:
+
+Student güncellendiğinde, ilişkili Lesson nesneleri de güncellenir.
+Ancak, Student silindiğinde Lesson silinmez.
+4️⃣ REMOVE
+✅ Ana entity silindiğinde, ilişkili entity'ler de silinir.
+
+
+@OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE)
+private List<Lesson> lessons;
+📌 Örnek:
+
+Student silindiğinde, ilişkili Lesson nesneleri de silinir.
+Ancak, Lesson bağımsız olarak silindiğinde Student etkilenmez.
+5️⃣ REFRESH
+✅ Ana entity veritabanından tekrar yüklendiğinde, ilişkili entity'ler de tekrar yüklenir.
+
+
+@OneToMany(mappedBy = "student", cascade = CascadeType.REFRESH)
+private List<Lesson> lessons;
+📌 Örnek:
+
+Veritabanındaki Student kaydı refresh edilirse, ilişkili Lesson nesneleri de güncellenir.
+6️⃣ DETACH
+✅ Ana entity detach edildiğinde, ilişkili entity'ler de detach edilir (JPA tarafından yönetilmez hale gelir).
+
+
+@OneToMany(mappedBy = "student", cascade = CascadeType.DETACH)
+private List<Lesson> lessons;
+📌 Örnek:
+
+Student nesnesi detach edilirse, ilişkili Lesson nesneleri de detach edilir.
+JPA artık bu nesneleri takip etmez, değişiklikler veritabanına yansımaz.
+
+
+CascadeType	Ne Zaman Kullanılır?
+
+ALL	    :     Tüm işlemler otomatik olsun (Genellikle OneToMany ve ManyToMany ilişkilerinde
+kullanılır).
+PERSIST :	 İlişkili entity'lerin de kaydedilmesini istiyorsan (Ancak silme işlemi
+ etkilemesin).
+MERGE   :	 Entity güncellendiğinde, ilişkili entity'lerin de güncellenmesini istiyorsan.
+REMOVE  :	 Ana entity silindiğinde, ilişkili entity'lerin de silinmesini istiyorsan.
+REFRESH	:    Ana entity'nin veritabanından tekrar yüklenmesi gerektiğinde, ilişkili entity'ler
+ de güncellensin istiyorsan.
+DETACH  :	 Ana entity yönetim dışına çıktığında, ilişkili entity'ler de yönetim dışı kalsın
+ istiyorsan.
+
+ ****************************************************
+
+ 📌 FetchType Nedir?
+ FetchType, JPA'da ilişkili entity'lerin nasıl yükleneceğini belirleyen bir stratejidir. Eager (hemen yükleme) veya Lazy (istek üzerine yükleme) şeklinde ayarlanabilir.
+
+ 🎯 FetchType Türleri
+ JPA'da iki farklı FetchType vardır:
+
+ 1️⃣ FetchType.LAZY (Tembel Yükleme)
+ ✅ İlişkili entity'ler veritabanından çağrılana kadar yüklenmez.
+ ✅ Performansı artırır, gereksiz sorguların çalışmasını önler.
+ ✅ Varsayılan olarak kullanılır:
+
+ @OneToMany
+ @ManyToMany
+
+ @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+ private List<Lesson> lessons;
+ 📌 Nasıl Çalışır?
+
+ Student çağrıldığında Lesson'lar otomatik olarak yüklenmez.
+ İlk erişildiğinde (örneğin getLessons() çağrıldığında) veritabanına sorgu atılır.
+ N+1 Problemine neden olabilir (Eğer döngüyle tüm Lesson'lar çekiliyorsa her biri için ayrı sorgu çalışır).
+ 2️⃣ FetchType.EAGER (Hızlı Yükleme)
+ ✅ İlişkili entity'ler ana entity ile birlikte hemen yüklenir.
+ ✅ Tek bir sorguda tüm veriler getirilir.
+ ✅ Varsayılan olarak kullanılır:
+
+ @ManyToOne
+ @OneToOne
+
+ @ManyToOne(fetch = FetchType.EAGER)
+ @JoinColumn(name = "teacher_id")
+ private Teacher teacher;
+ 📌 Nasıl Çalışır?
+
+ Student çağrıldığında ilişkili Teacher nesnesi de otomatik olarak yüklenir.
+ JOIN işlemiyle tüm verileri tek seferde alır, bu yüzden performans açısından daha maliyetli olabilir.
+ Eğer fazla ilişkili veri varsa gereksiz veri taşınmasına sebep olabilir.
+ 🎯 FetchType.LAZY vs FetchType.EAGER Karşılaştırması
+ Özellik	FetchType.LAZY	FetchType.EAGER
+ Veri yükleme	İlk erişildiğinde yüklenir	Hemen yüklenir
+ Performans	Daha iyi, çünkü sadece gerektiğinde veri çekilir	Daha maliyetli, çünkü gereksiz veri de yüklenebilir
+ Varsayılan Kullanım	@OneToMany, @ManyToMany	@ManyToOne, @OneToOne
+ Ne Zaman Kullanılır?	Büyük veri setlerinde, ilişkili entity'lere her zaman ihtiyaç duyulmuyorsa	Küçük veri setlerinde, ilişkili entity'ler sık sık kullanılıyorsa
+ 🎯 Örnek Kullanım
+ 📌 Örnek Senaryo:
+
+ Bir öğrenci (Student) birçok derse (Lesson) kayıtlı olabilir.
+ Her dersin bir öğretmeni (Teacher) vardır.
+ 1️⃣ FetchType.LAZY Kullanımı (@OneToMany)
+
+ @Entity
+ public class Student {
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long id;
+     private String name;
+
+     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+     private List<Lesson> lessons;
+ }
+ 📌 Ne Olur?
+
+ Student çağrıldığında Lesson'lar yüklenmez.
+ İlk kez getLessons() çağrıldığında veritabanına sorgu atılır.
+ 2️⃣ FetchType.EAGER Kullanımı (@ManyToOne)
+
+ @Entity
+ public class Lesson {
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long id;
+     private String name;
+
+     @ManyToOne(fetch = FetchType.EAGER)
+     @JoinColumn(name = "teacher_id")
+     private Teacher teacher;
+ }
+ 📌 Ne Olur?
+
+ Lesson çağrıldığında ilişkili Teacher nesnesi de otomatik olarak yüklenir.
+ JOIN işlemi kullanılır, böylece tek sorguda hem Lesson hem de Teacher verileri gelir.
+ 🎯 Hangi Durumda Hangi FetchType Kullanılır?
+ Kullanım Senaryosu	Önerilen FetchType
+ Veri seti büyükse, ilişkili nesneler her zaman kullanılmıyorsa	LAZY
+ İlişkili nesneye her zaman erişiliyorsa	EAGER
+ Birçok ilişkili nesne varsa (örneğin List<>)	LAZY
+ Tek bir ilişkili nesne varsa (@OneToOne, @ManyToOne)	EAGER
+ Performans optimizasyonu yapılıyorsa	Tercihen LAZY kullanılır, gerektiğinde JOIN FETCH ile optimize edilir
+ 🎯 Performans İçin Öneriler
+ FetchType.LAZY genellikle daha iyidir çünkü sadece gerektiğinde veri çeker.
+ EAGER sadece ilişkili nesneye her zaman ihtiyaç duyuluyorsa tercih edilmelidir.
+ Büyük projelerde EAGER yerine LAZY + JOIN FETCH kullanmak daha iyi olabilir.
+ 🚀 Sonuç olarak: Performansı korumak için genellikle FetchType.LAZY önerilir, ancak ihtiyaca göre EAGER kullanılabilir!
+
+ *****************************************************************************
+
+ 📌 @SuperBuilder Nedir?
+ @SuperBuilder, Lombok kütüphanesinde bulunan ve kalıtım (inheritance) içeren sınıflar için Builder tasarım desenini destekleyen bir anotasyondur.
+ 🚀 Builder Pattern + Inheritance desteği sağlar.
+
+ 📌 Normal @Builder yalnızca tek bir sınıf için çalışırken, @SuperBuilder üst sınıftaki (superclass) özellikleri de miras alır.
+
+ 🎯 @SuperBuilder Kullanımı
+ Diyelim ki Person adında bir üst sınıfımız var ve Student adında bir alt sınıfımız var.
+
+ 🟢 @SuperBuilder ile Kalıtım Kullanımı
+ java
+ Kopyala
+ Düzenle
+ import lombok.Getter;
+ import lombok.experimental.SuperBuilder;
+
+ @Getter
+ @SuperBuilder
+ class Person {
+     private String name;
+     private int age;
+ }
+ java
+ Kopyala
+ Düzenle
+ @Getter
+ @SuperBuilder
+ class Student extends Person {
+     private String school;
+ }
+ 📌 Nasıl Kullanılır?
+ java
+ Kopyala
+ Düzenle
+ public class Main {
+     public static void main(String[] args) {
+         Student student = Student.builder()
+                 .name("Ali")
+                 .age(25)
+                 .school("XYZ Üniversitesi")
+                 .build();
+
+         System.out.println(student.getName());  // Ali
+         System.out.println(student.getAge());   // 25
+         System.out.println(student.getSchool());// XYZ Üniversitesi
+     }
+ }
+ 🔴 @Builder vs @SuperBuilder Farkı
+
+ Özellik	                                @Builder	  @SuperBuilder
+ Üst sınıf (superclass) desteği	            ❌ Yok	    ✅ Var
+ Kalıtım ile çalışabilir mi?	            ❌ Hayır	✅ Evet
+ Alt sınıflar (subclasses) desteklenir mi?	❌ Hayır	✅ Evet

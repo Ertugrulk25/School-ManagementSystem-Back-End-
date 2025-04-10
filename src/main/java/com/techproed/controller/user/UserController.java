@@ -35,9 +35,11 @@ public class UserController {
     @PostMapping("/save/{userRole}")
     public ResponseEntity<ResponseMessage<UserResponse>> saveUser(
             @RequestBody @Valid UserRequest userRequest,
-            @PathVariable String userRole) {
+            @PathVariable String userRole
+    ){
         return ResponseEntity.ok(userService.saveUser(userRequest,userRole));
     }
+
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/getUserByPage/{userRole}")
     public ResponseEntity<Page<UserResponse>>getUserByPage(

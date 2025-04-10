@@ -1,6 +1,6 @@
 package com.techproed.payload.mappers;
 
-import com.techproed.entity.ContactMessage;
+import com.techproed.entity.concretes.business.ContactMessage;
 import com.techproed.payload.request.business.ContactMessageRequest;
 import com.techproed.payload.response.business.ContactMessageResponse;
 import lombok.RequiredArgsConstructor;

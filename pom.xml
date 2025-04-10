@@ -14,6 +14,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>school-management-backend-b326</name>
     <description>school-management-backend-b326</description>
+
+    <properties>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
+        <postgres.version>42.6.0</postgres.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -38,7 +44,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.6.0</version>
+            <version>${postgres.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -62,13 +68,36 @@
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
         </dependency>
+        <!-- MapStruct Dependency ****************-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
+        <!-- According to MapStruct documentation:
+        Thanks to this dependency, we will not have to configure Annotation Processor settings in IntelliJ -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${org.mapstruct.version}</version>
+            <optional>true</optional>
+        </dependency>
+
 
         <!-- SWAGGER ****************-->
-        <!--    <dependency>-->
-        <!--      <groupId>org.springdoc</groupId>-->
-        <!--      <artifactId>springdoc-openapi-ui</artifactId>-->
-        <!--      <version>1.6.9</version>-->
-        <!--    </dependency>-->
+            <dependency>
+              <groupId>org.springdoc</groupId>
+              <artifactId>springdoc-openapi-ui</artifactId>
+              <version>1.6.9</version>
+            </dependency>
+
+        <!-- WEKA-->
+
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.6</version>
+        </dependency>
 
     </dependencies>
 
@@ -84,6 +113,15 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

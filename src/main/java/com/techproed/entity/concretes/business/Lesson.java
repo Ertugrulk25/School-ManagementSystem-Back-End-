@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,8 +30,13 @@ public class Lesson {
     private Boolean isCompulsory;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "lessons")
-    private Set<LessonProgram> lessonPrograms;
+    @ManyToMany(mappedBy = "lessons")
+    private List<LessonProgram> lessonPrograms;
+
+
+
+
+
 
 
 }

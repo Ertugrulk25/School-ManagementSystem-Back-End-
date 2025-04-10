@@ -1,6 +1,6 @@
 package com.techproed.service.businnes;
 
-import com.techproed.entity.ContactMessage;
+import com.techproed.entity.concretes.business.ContactMessage;
 import com.techproed.exception.ResourceNotFoundException;
 import com.techproed.payload.mappers.ContactMessageMapper;
 import com.techproed.payload.messages.ErrorMessages;

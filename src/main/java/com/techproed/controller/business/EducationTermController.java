@@ -1,6 +1,7 @@
 package com.techproed.controller.business;
 
 import com.techproed.payload.request.business.EducationTermRequest;
+import com.techproed.payload.request.business.EducationTermUpdateRequest;
 import com.techproed.payload.response.business.EducationTermResponse;
 import com.techproed.payload.response.business.ResponseMessage;
 import com.techproed.service.businnes.EducationTermService;
@@ -17,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EducationTermController {
 
-
   private final EducationTermService educationTermService;
 
   @PreAuthorize("hasAnyAuthority('Admin','Dean')")
@@ -30,9 +30,9 @@ public class EducationTermController {
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean','Teacher')")
   @PutMapping("/update/{educationTermId}")
   public ResponseMessage<EducationTermResponse>updateEducationTerm(
-          @Valid @RequestBody EducationTermRequest educationTermRequest,
+          @Valid @RequestBody EducationTermUpdateRequest educationTermUpdateRequest,
           @PathVariable Long educationTermId){
-    return educationTermService.updateEducationTerm(educationTermRequest,educationTermId);
+    return educationTermService.updateEducationTerm(educationTermUpdateRequest,educationTermId);
   }
 
 
@@ -64,6 +64,8 @@ public class EducationTermController {
   public ResponseMessage deleteEducationTerm(@PathVariable Long educationTermId) {
     return educationTermService.deleteById(educationTermId);
   }
+
+
 
 
 

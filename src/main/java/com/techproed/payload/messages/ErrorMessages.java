@@ -18,6 +18,7 @@ public class ErrorMessages {
 
     //advisor teacher
     public static final String NOT_FOUND_ADVISOR_MESSAGE = "Error: Advisor Teacher with id %s not found" ;
+    public static final String NOT_ADVISOR_TEACHER_MESSAGE = "Error: Teacher with id %s is not an advisor teacher" ;
 
     //unique properties
     public static final String ALREADY_REGISTER_MESSAGE_USERNAME = "Error: User with username %s is already registered";
@@ -58,5 +59,8 @@ public class ErrorMessages {
     public static final String NOT_FOUND_MESSAGE_BETWEEN_DATES = "Message not Found between Dates : %s and %s";
     public static final String NOT_FOUND_MESSAGE_BETWEEN_TIMES = "Message not Found between Times : %s and %s";
     public static final String NOT_FOUND_MESSAGE_BY_SUBJECT = "Message not Found by Subject : %s";
+
+    //studentInfo
+    public static final String ALREADY_CREATED_STUDENT_INFO_FOR_LESSON = "Error: %s Student info already created";
 
 }

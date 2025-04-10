@@ -1,6 +1,6 @@
 package com.techproed.repository.business;
 
-import com.techproed.entity.ContactMessage;
+import com.techproed.entity.concretes.business.ContactMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

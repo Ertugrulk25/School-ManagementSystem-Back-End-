@@ -21,9 +21,11 @@ public class ContactMessageController {
 
 	@PostMapping("/save")
 	public ResponseEntity<ResponseMessage<ContactMessageResponse>> saveContactMessage(
-				@RequestBody @Valid ContactMessageRequest contactMessageRequest) {
-		return ResponseEntity.ok(contactMessageService.saveContactMessage(contactMessageRequest));
+			@RequestBody @Valid ContactMessageRequest contactMessageRequest
+	){
+		return  ResponseEntity.ok(contactMessageService.saveContactMessage(contactMessageRequest));
 	}
+
 
 	@GetMapping("/getAllMessages")
 	public ResponseEntity<ResponseMessage<List<ContactMessageResponse>>> getAllContactMessages() {

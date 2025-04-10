@@ -32,25 +32,26 @@ public class UserService {
     private final MethodHelper methodHelper;
     private final PageableHelper pageableHelper;
 
-    public ResponseMessage<UserResponse> saveUser(UserRequest userRequest, String userRole) {
-        //validate unique prop.
+    public ResponseMessage<UserResponse> saveUser(@Valid UserRequest userRequest, String userRole) {
+    //validate unique prop.
         uniquePropertyValidator.checkDuplication(
                 userRequest.getUsername(),
                 userRequest.getSsn(),
                 userRequest.getPhoneNumber(),
                 userRequest.getEmail()
         );
-        //DTO->entity mapping
+        //DTO-Entity mapping
         User userToSave = userMapper.mapUserRequestToUser(userRequest,userRole);
         //save operation
-        User savedUser = userRepository.save(userToSave);
-        //entity ->DTO mapping
+        User saveUser = userRepository.save(userToSave);
+//        //entity ->DTO mapping
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_CREATE)
-                .returnBody(userMapper.mapUserToUserResponse(savedUser))
+                .returnBody(userMapper.mapUserToUserResponse(saveUser))
                 .httpStatus(HttpStatus.OK)
                 .build();
     }
+
 
     public ResponseMessage<BaseUserResponse> findUserById(Long userId) {
         //validate if user exist in DB
@@ -127,4 +128,6 @@ uniquePropertyValidator.checkUniqueProperty(userFromDb, userRequest);
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+
 }

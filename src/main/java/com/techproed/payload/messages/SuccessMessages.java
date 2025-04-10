@@ -1,5 +1,4 @@
 package com.techproed.payload.messages;
-
 public class SuccessMessages {
 
     private SuccessMessages() {
@@ -71,3 +70,4 @@ public class SuccessMessages {
     public static final String MESSAGES_FETCHED_BY_EMAIL = "Messages fetched successfully by email : %s";
 
 }
+

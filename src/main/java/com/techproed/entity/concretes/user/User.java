@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.techproed.entity.concretes.business.LessonProgram;
 import com.techproed.entity.concretes.business.Meet;
+import com.techproed.entity.concretes.business.StudentFeedback;
 import com.techproed.entity.concretes.business.StudentInfo;
 import com.techproed.entity.enums.Day;
 import com.techproed.entity.enums.Gender;
@@ -96,14 +97,15 @@ Yalnızca giriş (deserialization) için izin verir, ancak JSON çıktısında
             inverseJoinColumns = @JoinColumn(name = "lesson_program_id")
 
     )
-    private Set<LessonProgram>lessonProgramList;
+    private List<LessonProgram>lessonProgramList;
 
 
     @JsonIgnore
     @ManyToMany(mappedBy = "studentList")
     private List<Meet> meetList;
 
-
+    @OneToOne(mappedBy = "student") // "student" StudentFeedback entity'sindeki alanı referans alacak
+    private StudentFeedback studentFeedback;
 
 }
 /*Java'da "builder" deseni, özellikle karmaşık nesne oluşturma süreçlerini daha

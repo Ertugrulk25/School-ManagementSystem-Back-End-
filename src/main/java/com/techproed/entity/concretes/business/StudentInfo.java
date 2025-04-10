@@ -33,7 +33,7 @@ public class StudentInfo {
     private Double examAverage;
 
     @Enumerated(EnumType.STRING)
-    private Note letterNote;
+    private Note letterGrade;
 
     @ManyToOne
     @JsonIgnore
